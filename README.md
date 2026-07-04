@@ -1,3 +1,4 @@
+Live Demo: https://market-entry-analyzer.onrender.com
 # Global Market Entry Analyzer
 
 An AI-powered strategy tool that generates consulting-grade market entry reports using live web research.
