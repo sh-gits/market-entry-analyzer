@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Market Entry Analyzer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: #555;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            padding: 10px 24px;
+            border: 1px solid #333;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            border-color: #4fc3f7;
+            color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.05);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: #555;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: #111;
+            border: 1px solid #222;
+            color: #e0e0e0;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #4fc3f7;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 16px;
+            background: #4fc3f7;
+            color: #0a0a0a;
+            border: none;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .analyze-btn:hover { background: #81d4fa; }
+        .analyze-btn:disabled { background: #333; color: #555; cursor: not-allowed; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .report-container {
+            margin-top: 50px;
+            display: none;
+        }
+
+        .report-header {
+            border-bottom: 1px solid #222;
+            padding-bottom: 16px;
+            margin-bottom: 30px;
+        }
+
+        .report-header h2 {
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #4fc3f7;
+        }
+
+        .report-body {
+            line-height: 1.8;
+            color: #ccc;
+        }
+
+        .report-body h2 {
+            color: #ffffff;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin: 30px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .report-body p { margin-bottom: 12px; }
+
+        .sources-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .sources-section h3 {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .source-item {
+            margin-bottom: 10px;
+        }
+
+        .source-item a {
+            color: #4fc3f7;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .source-item a:hover { text-decoration: underline; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MARKET ENTRY ANALYZER</h1>
+        <p class="subtitle">Strategy intelligence powered by live research</p>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="setMode('real')">Real Company</button>
+            <button class="mode-btn" onclick="setMode('venture')">New Venture</button>
+        </div>
+
+        <div id="real-mode">
+            <div class="input-group">
+                <label>Company Name</label>
+                <input type="text" id="company-name" placeholder="e.g. Spotify, Zara, Reliance">
+            </div>
+        </div>
+
+        <div id="venture-mode" class="hidden">
+            <div class="input-group">
+                <label>Describe Your Venture</label>
+                <textarea id="description" placeholder="e.g. A B2B SaaS platform that automates procurement for mid-size manufacturers"></textarea>
+            </div>
+            <div class="input-group">
+                <label>Industry</label>
+                <input type="text" id="industry" placeholder="e.g. SaaS, Retail, Fintech, Healthcare">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Target Country</label>
+            <input type="text" id="target-country" placeholder="e.g. Germany, Japan, Brazil">
+        </div>
+
+        <button class="analyze-btn" onclick="analyze()" id="analyze-btn">
+            Run Analysis
+        </button>
+
+        <div class="loading" id="loading">
+            Researching market... this takes 20–30 seconds
+        </div>
+
+        <div class="report-container" id="report-container">
+            <div class="report-header">
+                <h2 id="report-title">MARKET ENTRY REPORT</h2>
+            </div>
+            <div class="report-body" id="report-body"></div>
+            <div class="sources-section">
+                <h3>Sources</h3>
+                <div id="sources-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'real';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('real-mode').classList.toggle('hidden', mode !== 'real');
+            document.getElementById('venture-mode').classList.toggle('hidden', mode !== 'venture');
+        }
+
+        function formatReport(text) {
+            return text
+                .replace(/## (.*)/g, '<h2>$1</h2>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+        }
+
+        async function analyze() {
+            const targetCountry = document.getElementById('target-country').value.trim();
+            if (!targetCountry) { alert('Please enter a target country.'); return; }
+
+            let payload = { mode: currentMode, target_country: targetCountry };
+
+            if (currentMode === 'real') {
+                const companyName = document.getElementById('company-name').value.trim();
+                if (!companyName) { alert('Please enter a company name.'); return; }
+                payload.company_name = companyName;
+            } else {
+                const description = document.getElementById('description').value.trim();
+                const industry = document.getElementById('industry').value.trim();
+                if (!description || !industry) { alert('Please fill in all venture fields.'); return; }
+                payload.description = description;
+                payload.industry = industry;
+            }
+
+            document.getElementById('analyze-btn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('report-container').style.display = 'none';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                document.getElementById('report-body').innerHTML = '<p>' + formatReport(data.report) + '</p>';
+
+                const sourcesList = document.getElementById('sources-list');
+                sourcesList.innerHTML = '';
+                data.sources.forEach(source => {
+                    sourcesList.innerHTML += `<div class="source-item"><a href="${source.url}" target="_blank">${source.title}</a></div>`;
+                });
+
+                document.getElementById('report-container').style.display = 'block';
+            } catch (err) {
+                alert('Something went wrong. Check the terminal for errors.');
+            } finally {
+                document.getElementById('analyze-btn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
