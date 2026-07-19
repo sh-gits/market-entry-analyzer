@@ -19,4 +19,4 @@ An AI-powered strategy tool that generates consulting-grade market entry reports
 2. Add your API keys to a `.env` file
 3. Run `pip install -r requirements.txt`
 4. Run `python3 app.py`
-5. Open `http://127.0.0.1:5000`
+5. Open `http://127.0.0.1:8080`
